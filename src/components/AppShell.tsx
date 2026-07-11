@@ -25,7 +25,19 @@ export function AppShell({
         onNavigate={onNavigate}
         profileActive={profileActive}
       />
-      <main className="grid content-start gap-3.5">{children}</main>
+      <div className="grid content-start gap-3.5">
+        <header className="flex justify-end">
+          <a
+            href="https://earlgreyhot1701d.github.io/Clew-Labs/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-bold uppercase tracking-wide text-brass hover:text-signal transition-colors"
+          >
+            About ↗
+          </a>
+        </header>
+        <main className="grid content-start gap-3.5">{children}</main>
+      </div>
       <footer className="ns-footer col-span-full mt-6 rounded-xl border border-line/50 px-6 py-8 text-center">
         <p className="text-xs uppercase tracking-widest text-paper-dim">
           North Star · Decision Assistant · Powered by Amazon Bedrock
