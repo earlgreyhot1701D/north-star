@@ -1,7 +1,6 @@
 "use client";
 
 import { Rivets } from "./Rivets";
-import { Compass } from "./Compass";
 import { NAV_ITEMS, type View } from "./views";
 
 interface SidebarProps {
@@ -20,7 +19,15 @@ export function Sidebar({ active, onNavigate, profileActive }: SidebarProps) {
 
       <div className="mx-4 mb-5 border border-brass-dim/60 px-3 py-4 text-center">
         <div className="mx-auto mb-2 flex justify-center">
-          <Compass size={72} />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/assets/logo-emblem.png"
+            alt="North Star compass"
+            width={72}
+            height={72}
+            className="rounded-full"
+            loading="lazy"
+          />
         </div>
         <h1 className="m-0 text-2xl font-black tracking-wider text-paper">
           North Star

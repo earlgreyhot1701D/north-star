@@ -26,6 +26,11 @@ export function AppShell({
         profileActive={profileActive}
       />
       <main className="grid content-start gap-3.5">{children}</main>
+      <footer className="ns-footer col-span-full mt-6 rounded-xl border border-line/50 px-6 py-8 text-center">
+        <p className="text-xs uppercase tracking-widest text-paper-dim">
+          North Star · Decision Assistant · Powered by Amazon Bedrock
+        </p>
+      </footer>
     </div>
   );
 }

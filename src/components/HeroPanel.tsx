@@ -10,13 +10,9 @@ interface HeroPanelProps {
 export function HeroPanel({ profileActive, onPrimary }: HeroPanelProps) {
   return (
     <section
-      className="ns-panel relative overflow-hidden rounded-2xl"
+      className="ns-panel ns-hero relative overflow-hidden rounded-2xl"
       aria-labelledby="hero-heading"
-      style={{
-        minHeight: 360,
-        background:
-          "linear-gradient(90deg, rgba(12,12,10,0.94) 0%, rgba(12,12,10,0.7) 46%, rgba(11,95,134,0.18) 100%), radial-gradient(circle at 82% 30%, rgba(34,168,224,0.28), transparent 42%), radial-gradient(circle at 88% 68%, rgba(167,138,88,0.22), transparent 40%), linear-gradient(135deg, #14140f, #0c0c0a)",
-      }}
+      style={{ minHeight: 360 }}
     >
       <Rivets />
 

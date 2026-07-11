@@ -13,7 +13,7 @@ export function AlignmentGauge({ score, label, size = 190 }: AlignmentGaugeProps
   const clamped = Math.max(0, Math.min(100, Math.round(score)));
   return (
     <div
-      className="grid place-items-center rounded-full"
+      className="ns-gauge-reveal grid place-items-center rounded-full"
       role="img"
       aria-label={`Decision Alignment Score ${clamped} out of 100. ${label}.`}
       style={{
