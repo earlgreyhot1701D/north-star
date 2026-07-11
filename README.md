@@ -1,5 +1,9 @@
 # North Star
 
+<p align="center">
+  <img src="public/assets/github-hero.png" alt="North Star — AI Decision Assistant" width="100%" />
+</p>
+
 North Star is an AI powered decision assistant that evaluates an opportunity
 against **your own** goals, priorities, strengths, constraints, available time,
 and risk tolerance — and returns a personalized **Decision Alignment Score**
