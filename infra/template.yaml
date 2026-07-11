@@ -1,0 +1,141 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  North Star — evaluate a decision against a personal profile using Amazon
+  Bedrock (Nova Lite). One Lambda behind a single POST API Gateway endpoint with
+  least-privilege IAM, CloudWatch logging, configurable CORS, and throttling.
+
+Parameters:
+  BedrockModelId:
+    Type: String
+    Default: amazon.nova-lite-v1:0
+    Description: Bedrock model identifier used for evaluation.
+  AllowedOrigin:
+    Type: String
+    Default: ""
+    Description: Production origin allowed by CORS (e.g. https://north-star.vercel.app). Leave blank until Vercel is deployed.
+  LocalOrigin:
+    Type: String
+    Default: http://localhost:3000
+    Description: Local development origin allowed by CORS.
+  LogLevel:
+    Type: String
+    Default: info
+    AllowedValues: [debug, info, warn, error]
+    Description: Lambda log verbosity. Only operational metadata is ever logged.
+  ThrottleRateLimit:
+    Type: Number
+    Default: 5
+    Description: Steady-state requests per second at the API stage.
+  ThrottleBurstLimit:
+    Type: Number
+    Default: 10
+    Description: Maximum burst request capacity at the API stage.
+  ReservedConcurrency:
+    Type: Number
+    Default: 5
+    Description: Reserved concurrent executions for the evaluate function (cost + abuse ceiling).
+  LogRetentionDays:
+    Type: Number
+    Default: 14
+    Description: CloudWatch log retention in days.
+
+Conditions:
+  HasAllowedOrigin: !Not [!Equals [!Ref AllowedOrigin, ""]]
+
+Globals:
+  Function:
+    Timeout: 29
+    MemorySize: 512
+    Runtime: nodejs22.x
+    Architectures: [arm64]
+
+Resources:
+  EvaluateApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      # Restrictive CORS — only the configured origins. No wildcard in production.
+      Cors:
+        AllowMethods: "'POST,OPTIONS'"
+        AllowHeaders: "'Content-Type,x-request-id'"
+        AllowOrigin: !If
+          - HasAllowedOrigin
+          - !Sub "'${AllowedOrigin}'"
+          - !Sub "'${LocalOrigin}'"
+      MethodSettings:
+        - ResourcePath: "/*"
+          HttpMethod: "*"
+          ThrottlingRateLimit: !Ref ThrottleRateLimit
+          ThrottlingBurstLimit: !Ref ThrottleBurstLimit
+      AccessLogSetting:
+        DestinationArn: !GetAtt ApiAccessLogGroup.Arn
+        # Metadata only — no request/response bodies.
+        Format: >-
+          {"requestId":"$context.requestId","ip":"$context.identity.sourceIp","httpMethod":"$context.httpMethod","routeKey":"$context.resourcePath","status":"$context.status","responseLatency":"$context.responseLatency"}
+
+  ApiAccessLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/apigateway/north-star-evaluate"
+      RetentionInDays: !Ref LogRetentionDays
+
+  EvaluateFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: node22
+        Sourcemap: false
+        EntryPoints:
+          - src/handler.ts
+        External:
+          - "@aws-sdk/*"
+    Properties:
+      FunctionName: north-star-evaluate
+      CodeUri: lambda/
+      Handler: handler.handler
+      ReservedConcurrentExecutions: !Ref ReservedConcurrency
+      Environment:
+        Variables:
+          BEDROCK_MODEL_ID: !Ref BedrockModelId
+          ALLOWED_ORIGIN: !Ref AllowedOrigin
+          LOCAL_ORIGIN: !Ref LocalOrigin
+          LOG_LEVEL: !Ref LogLevel
+      Policies:
+        # Least privilege: invoke ONLY the selected Bedrock model. No admin,
+        # no wildcard resources beyond the model family needed for inference.
+        - Statement:
+            - Sid: InvokeBedrockModel
+              Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+              Resource:
+                - !Sub "arn:${AWS::Partition}:bedrock:${AWS::Region}::foundation-model/${BedrockModelId}"
+                - !Sub "arn:${AWS::Partition}:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/${BedrockModelId}"
+      Events:
+        Evaluate:
+          Type: Api
+          Properties:
+            RestApiId: !Ref EvaluateApi
+            Path: /evaluate
+            Method: post
+
+  # Explicit log group so retention is managed and no user content is retained.
+  EvaluateFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/north-star-evaluate"
+      RetentionInDays: !Ref LogRetentionDays
+
+Outputs:
+  EvaluateApiUrl:
+    Description: POST this URL from the Vercel proxy (set as EVALUATION_API_URL).
+    Value: !Sub "https://${EvaluateApi}.execute-api.${AWS::Region}.amazonaws.com/prod/evaluate"
+  EvaluateFunctionName:
+    Description: Lambda function name.
+    Value: !Ref EvaluateFunction
+  BedrockModelId:
+    Description: Bedrock model identifier in use.
+    Value: !Ref BedrockModelId

@@ -1,0 +1,23 @@
+{
+  "name": "north-star-evaluate-lambda",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AWS Lambda that evaluates a decision against a personal profile using Amazon Bedrock Nova Lite.",
+  "main": "dist/handler.js",
+  "scripts": {
+    "build": "esbuild src/handler.ts --bundle --platform=node --target=node22 --outfile=dist/handler.js --external:@aws-sdk/*",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "3.658.1",
+    "zod": "3.23.8",
+    "esbuild": "0.23.1"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "8.10.145",
+    "@types/node": "20.14.15",
+    "typescript": "5.5.4",
+    "vitest": "2.0.5"
+  }
+}

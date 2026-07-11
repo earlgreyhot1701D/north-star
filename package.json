@@ -1,0 +1,46 @@
+{
+  "name": "north-star",
+  "version": "1.0.0",
+  "private": true,
+  "description": "North Star — AI powered decision assistant that scores an opportunity against your personal profile.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "sam:validate": "sam validate --lint --template infra/template.yaml",
+    "sam:build": "sam build --template infra/template.yaml",
+    "sam:deploy": "sam deploy --guided --template infra/template.yaml",
+    "sam:delete": "sam delete --stack-name north-star"
+  },
+  "dependencies": {
+    "next": "14.2.35",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "zod": "3.23.8"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "6.4.8",
+    "@testing-library/react": "16.0.1",
+    "@testing-library/user-event": "14.5.2",
+    "@types/node": "20.14.15",
+    "@types/react": "18.3.4",
+    "@types/react-dom": "18.3.0",
+    "@vitejs/plugin-react": "4.3.1",
+    "autoprefixer": "10.4.20",
+    "eslint": "8.57.0",
+    "eslint-config-next": "14.2.35",
+    "jsdom": "24.1.1",
+    "postcss": "8.4.41",
+    "tailwindcss": "3.4.10",
+    "typescript": "5.5.4",
+    "vitest": "2.0.5"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  }
+}
