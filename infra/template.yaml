@@ -42,6 +42,7 @@ Parameters:
 
 Conditions:
   HasAllowedOrigin: !Not [!Equals [!Ref AllowedOrigin, ""]]
+  HasReservedConcurrency: !Not [!Equals [!Ref ReservedConcurrency, 0]]
 
 Globals:
   Function:
@@ -96,7 +97,7 @@ Resources:
       FunctionName: north-star-evaluate
       CodeUri: lambda/
       Handler: handler.handler
-      ReservedConcurrentExecutions: !Ref ReservedConcurrency
+      ReservedConcurrentExecutions: !If [HasReservedConcurrency, !Ref ReservedConcurrency, !Ref "AWS::NoValue"]
       Environment:
         Variables:
           BEDROCK_MODEL_ID: !Ref BedrockModelId
