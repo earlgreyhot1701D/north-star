@@ -2,6 +2,7 @@ version = 0.1
 
 [default.global.parameters]
 stack_name = "north-star"
+region = "us-east-1"
 
 [default.build.parameters]
 cached = true
@@ -14,7 +15,10 @@ resolve_s3 = true
 region = "us-east-1"
 # Fill AllowedOrigin after the Vercel deployment exists. Leave it blank for the
 # first deploy, then redeploy with the real origin.
-parameter_overrides = "BedrockModelId=\"amazon.nova-lite-v1:0\" LocalOrigin=\"http://localhost:3000\" LogLevel=\"info\""
+parameter_overrides = "BedrockModelId=\"amazon.nova-lite-v1:0\" AllowedOrigin=\"\" LocalOrigin=\"http://localhost:3000\" LogLevel=\"info\" ThrottleRateLimit=\"5\" ThrottleBurstLimit=\"10\" ReservedConcurrency=\"5\" LogRetentionDays=\"14\""
+s3_prefix = "north-star"
+disable_rollback = true
+image_repositories = []
 
 [default.validate.parameters]
 lint = true
